@@ -1,0 +1,221 @@
+{% extends 'events/base.html' %}
+
+{% block title %}My Events - EventFolio{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20"></div>
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+    </div>
+    
+    <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-6xl font-bold mb-6">
+            <span class="gradient-text">My Events</span>
+        </h1>
+        <p class="text-xl text-gray-400 mb-8">
+            Manage your event registrations and track your upcoming experiences.
+        </p>
+        
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-3xl font-bold gradient-text">{{ registrations.count }}</div>
+                        <div class="text-gray-400 text-sm">Total Events</div>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-purple-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-3xl font-bold text-green-400">{{ registrations.count }}</div>
+                        <div class="text-gray-400 text-sm">Upcoming</div>
+                    </div>
+                    <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-green-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-effect rounded-2xl p-6 border border-gray-800">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-3xl font-bold text-gray-400">0</div>
+                        <div class="text-gray-400 text-sm">Past Events</div>
+                    </div>
+                    <div class="w-12 h-12 bg-gray-500/20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-history text-gray-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Events List Section -->
+<section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        {% if registrations %}
+            <div class="space-y-6">
+                {% for registration in registrations %}
+                <div class="glass-effect rounded-2xl p-8 border border-gray-800 hover-glow transition-all duration-300">
+                    <div class="flex flex-col lg:flex-row gap-6">
+                        <!-- Event Image -->
+                        <div class="lg:w-48">
+                            <div class="h-32 lg:h-full aspect-video lg:aspect-square bg-gradient-to-br from-purple-600/20 to-pink-600/20 rounded-xl flex items-center justify-center">
+                                <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                                    <i class="fas fa-calendar-alt text-white text-2xl"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Event Details -->
+                        <div class="flex-1">
+                            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white mb-2">{{ registration.event.title }}</h3>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center text-gray-400">
+                                            <i class="fas fa-clock mr-3 text-purple-400"></i>
+                                            {{ registration.event.date|date:"l, F d, Y - g:i A" }}
+                                        </div>
+                                        <div class="flex items-center text-gray-400">
+                                            <i class="fas fa-map-marker-alt mr-3 text-purple-400"></i>
+                                            {{ registration.event.location }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <a href="{% url 'event_detail' registration.event.pk %}" 
+                                       class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 text-center">
+                                        <i class="fas fa-eye mr-2"></i>View Details
+                                    </a>
+                                    <button onclick="confirmCancel('{{ registration.event.pk }}')" 
+                                            class="px-6 py-3 glass-effect text-red-400 rounded-lg font-medium hover:bg-red-500/10 transition-all duration-300 border border-red-500/30">
+                                        <i class="fas fa-times mr-2"></i>Cancel
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Registration Status -->
+                            <div class="mt-6 flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium border border-green-500/30">
+                                        <i class="fas fa-check-circle mr-2"></i>{{ registration.status }}
+                                    </span>
+                                    <span class="text-gray-500 text-sm">
+                                        Registered on {{ registration.event.date|date:"M d, Y" }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center space-x-4">
+                                    <button class="text-gray-400 hover:text-white transition-colors">
+                                        <i class="fas fa-calendar-plus"></i>
+                                    </button>
+                                    <button class="text-gray-400 hover:text-white transition-colors">
+                                        <i class="fas fa-share"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-20">
+                <div class="w-32 h-32 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i class="fas fa-calendar-times text-gray-600 text-4xl"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-4">No Events Yet</h2>
+                <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+                    You haven't registered for any events yet. Explore our amazing events and join the community!
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'events' %}" 
+                       class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300">
+                        <i class="fas fa-compass mr-2"></i>Explore Events
+                    </a>
+                    <button class="px-8 py-4 glass-effect text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 border border-white/20">
+                        <i class="fas fa-bell mr-2"></i>Get Notifications
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Calendar Section -->
+{% if registrations %}
+<section class="py-20 px-4">
+    <div class="max-w-6xl mx-auto">
+        <div class="glass-effect rounded-2xl p-8 border border-gray-800">
+            <h2 class="text-2xl font-bold text-white mb-6">
+                <span class="gradient-text">Event Calendar</span>
+            </h2>
+            <div class="grid grid-cols-7 gap-2 mb-4">
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Sun</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Mon</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Tue</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Wed</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Thu</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Fri</div>
+                <div class="text-center text-sm font-medium text-gray-500 py-2">Sat</div>
+            </div>
+            <div class="grid grid-cols-7 gap-2">
+                <!-- Calendar days -->
+                {% for day in 28 %}
+                    <div class="aspect-square glass-effect rounded-lg flex items-center justify-center text-sm text-gray-400 hover:bg-white/10 cursor-pointer transition-all duration-300 border border-gray-700">
+                        {{ forloop.counter }}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+        <div class="gradient-border rounded-2xl p-1">
+            <div class="glass-effect rounded-2xl p-12">
+                <h2 class="text-3xl font-bold mb-4">
+                    <span class="gradient-text">Ready for More Events?</span>
+                </h2>
+                <p class="text-xl text-gray-400 mb-8">
+                    Discover more amazing events and expand your network.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'events' %}" 
+                       class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300">
+                        <i class="fas fa-compass mr-2"></i>Explore More Events
+                    </a>
+                    <button class="px-8 py-4 glass-effect text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 border border-white/20">
+                        <i class="fas fa-cog mr-2"></i>Event Preferences
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmCancel(eventId) {
+    if (confirm('Are you sure you want to cancel your registration for this event?')) {
+        // In a real app, this would make an API call to cancel the registration
+        alert('Registration cancelled successfully!');
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

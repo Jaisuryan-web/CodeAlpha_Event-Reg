@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Event Registration{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            background: #0a0a0a;
+            border-radius: inherit;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-effect border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-8">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-white text-sm"></i>
+                        </div>
+                        <span class="text-xl font-bold gradient-text">Evenza</span>
+                    </div>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="{% url 'events' %}" class="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-2">
+                            <i class="fas fa-compass text-sm"></i>
+                            <span>Explore</span>
+                        </a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'my_registrations' %}" class="text-gray-300 hover:text-white transition-colors duration-200 flex items-center space-x-2">
+                                <i class="fas fa-ticket-alt text-sm"></i>
+                                <span>My Events</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if user.is_authenticated %}
+                        <div class="flex items-center space-x-4">
+                            <div class="text-sm text-gray-400">
+                                <span class="text-gray-500">Welcome,</span>
+                                <span class="text-white font-medium">{{ user.username }}</span>
+                            </div>
+                            <form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all duration-200 border border-red-500/30">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <div class="flex space-x-3">
+                            <a href="{% url 'login' %}" class="px-4 py-2 text-gray-400 hover:text-white transition-colors duration-200">
+                                Login
+                            </a>
+                            <a href="{% url 'login' %}" class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-200">
+                                Sign Up
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+            {% for message in messages %}
+                <div class="glass-effect rounded-lg p-4 border {% if message.tags == 'success' %}border-green-500/30 bg-green-500/10 text-green-400{% elif message.tags == 'warning' %}border-yellow-500/30 bg-yellow-500/10 text-yellow-400{% elif message.tags == 'error' %}border-red-500/30 bg-red-500/10 text-red-400{% else %}border-blue-500/30 bg-blue-500/10 text-blue-400{% endif %}">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% elif message.tags == 'error' %}fa-times-circle{% else %}fa-info-circle{% endif %}"></i>
+                        <p class="text-sm font-medium">{{ message }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 bg-black/50 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-calendar-alt text-white text-sm"></i>
+                    </div>
+                    <span class="text-xl font-bold gradient-text">Evenza</span>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                </div>
+                <div class="text-sm text-gray-500">
+                    © 2024 Evenza. Built with passion.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
