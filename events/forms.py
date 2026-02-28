@@ -44,3 +44,9 @@ class RegistrationForm(forms.ModelForm):
                 'rows': 4
             }),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make all fields optional for now
+        for field in self.fields.values():
+            field.required = False

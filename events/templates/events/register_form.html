@@ -101,7 +101,7 @@
 
                                 <div>
                                     <label for="{{ form.degree_or_position.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-                                        {{ form.role.value|default:"Degree" if form.role.value == "student" else "Position" }} *
+                                        <span id="degreePositionLabel">Degree *</span>
                                     </label>
                                     {{ form.degree_or_position }}
                                 </div>
@@ -190,13 +190,21 @@
 // Dynamic label text based on role selection
 document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('{{ form.role.id_for_label }}');
-    const degreeLabel = document.querySelector('label[for="{{ form.degree_or_position.id_for_label }}"]');
+    const degreeLabel = document.getElementById('degreePositionLabel');
     
-    if (roleSelect && degreeLabel) {
-        roleSelect.addEventListener('change', function() {
-            const labelText = this.value === 'student' ? 'Degree *' : 'Position *';
-            degreeLabel.innerHTML = labelText;
-        });
+    function updateLabel() {
+        if (roleSelect && degreeLabel) {
+            const labelText = roleSelect.value === 'student' ? 'Degree *' : 'Position *';
+            degreeLabel.textContent = labelText;
+        }
+    }
+    
+    // Initial update
+    updateLabel();
+    
+    // Update on change
+    if (roleSelect) {
+        roleSelect.addEventListener('change', updateLabel);
     }
 });
 </script>

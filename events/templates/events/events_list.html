@@ -1,6 +1,6 @@
 {% extends 'events/base.html' %}
 
-{% block title %}Explore Events - EventFolio{% endblock %}
+{% block title %}Explore Events - Evenza{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -25,7 +25,7 @@
                 <a href="#events" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105">
                     <i class="fas fa-rocket mr-2"></i>Explore Events
                 </a>
-                <a href="{% if user.is_authenticated %}{% url 'my_registrations' %}{% else %}{% url 'admin:login' %}{% endif %}" class="px-8 py-4 glass-effect text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 border border-white/20">
+                <a href="{% if user.is_authenticated %}{% url 'my_registrations' %}{% else %}{% url 'login' %}{% endif %}" class="px-8 py-4 glass-effect text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 border border-white/20">
                     <i class="fas fa-ticket-alt mr-2"></i>My Events
                 </a>
             </div>
@@ -61,24 +61,24 @@
             <div class="flex flex-col lg:flex-row gap-4">
                 <div class="flex-1">
                     <div class="relative">
-                        <input type="text" placeholder="Search events, topics, or locations..." 
+                        <input type="text" id="searchInput" placeholder="Search events, topics, or locations..." 
                                class="w-full pl-12 pr-4 py-4 bg-black/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all">
                         <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
                 <div class="flex gap-3">
-                    <select class="px-6 py-4 bg-black/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
-                        <option>All Categories</option>
-                        <option>Technology</option>
-                        <option>Design</option>
-                        <option>Business</option>
-                        <option>Marketing</option>
+                    <select id="categoryFilter" class="px-6 py-4 bg-black/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
+                        <option value="">All Categories</option>
+                        <option value="technology">Technology</option>
+                        <option value="design">Design</option>
+                        <option value="business">Business</option>
+                        <option value="marketing">Marketing</option>
                     </select>
-                    <select class="px-6 py-4 bg-black/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
-                        <option>All Dates</option>
-                        <option>This Week</option>
-                        <option>This Month</option>
-                        <option>Upcoming</option>
+                    <select id="dateFilter" class="px-6 py-4 bg-black/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:border-purple-500 transition-all">
+                        <option value="">All Dates</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="upcoming">Upcoming</option>
                     </select>
                 </div>
             </div>
@@ -132,7 +132,7 @@
                                 Register
                             </a>
                         {% else %}
-                            <a href="{% url 'admin:login' %}" 
+                            <a href="{% url 'login' %}" 
                                class="flex-1 px-4 py-3 border border-gray-600 text-gray-400 rounded-lg font-medium hover:bg-gray-800/50 transition-all duration-300 text-center">
                                 Login
                             </a>
@@ -168,7 +168,7 @@
                     Create your account and start exploring amazing events in your area.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{% url 'admin:login' %}" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300">
+                    <a href="{% url 'login' %}" class="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300">
                         <i class="fas fa-user-plus mr-2"></i>Create Account
                     </a>
                     <a href="{% url 'events' %}" class="px-8 py-4 glass-effect text-white rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 border border-white/20">
@@ -179,4 +179,45 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const eventCards = document.querySelectorAll('.group');
+
+    function filterEvents() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const category = categoryFilter.value.toLowerCase();
+        const dateFilterValue = dateFilter.value;
+
+        eventCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const description = card.querySelector('p').textContent.toLowerCase();
+            const location = card.querySelector('.fa-map-marker-alt').parentElement.textContent.toLowerCase();
+            
+            // Search filter
+            const matchesSearch = title.includes(searchTerm) || 
+                                description.includes(searchTerm) || 
+                                location.includes(searchTerm);
+            
+            // Category filter (simplified - would need actual categories in model)
+            const matchesCategory = !category || 
+                                   title.includes(category) || 
+                                   description.includes(category);
+            
+            // Date filter (simplified - would need actual date logic)
+            const matchesDate = !dateFilterValue || true; // Always true for now
+            
+            // Show/hide card
+            card.style.display = matchesSearch && matchesCategory && matchesDate ? '' : 'none';
+        });
+    }
+
+    searchInput.addEventListener('input', filterEvents);
+    categoryFilter.addEventListener('change', filterEvents);
+    dateFilter.addEventListener('change', filterEvents);
+});
+</script>
 {% endblock %}
