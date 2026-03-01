@@ -45,14 +45,15 @@ def register_event(request, pk):
     else:
         form = RegistrationForm()
     
-    return render(request, 'events/register_form.html', {
+    return render(request, 'events/register_form_simple.html', {
         'form': form,
         'event': event
     })
 
 @login_required
 def my_registrations(request):
-    registrations = Registration.objects.filter(user=request.user).select_related('event')
+    # Use only the basic fields that exist in the database
+    registrations = Registration.objects.filter(user=request.user).select_related('event').only('id', 'user', 'event', 'status')
     return render(request, 'events/my_registrations.html', {'registrations': registrations})
 
 class EventListView(generics.ListAPIView):
