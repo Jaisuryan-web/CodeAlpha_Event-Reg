@@ -34,19 +34,17 @@ def register_event(request, pk):
         return redirect('event_detail', pk=pk)
     
     if request.method == 'POST':
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            registration = form.save(commit=False)
-            registration.user = request.user
-            registration.event = event
-            registration.save()
-            messages.success(request, 'Successfully registered for the event!')
-            return redirect('event_detail', pk=pk)
-    else:
-        form = RegistrationForm()
+        # Create registration with only basic fields that exist in database
+        registration = Registration.objects.create(
+            user=request.user,
+            event=event,
+            status='Registered'
+        )
+        messages.success(request, 'Successfully registered for the event!')
+        return redirect('event_detail', pk=pk)
     
+    # For GET request, show simple form
     return render(request, 'events/register_form_simple.html', {
-        'form': form,
         'event': event
     })
 
