@@ -1,0 +1,166 @@
+{% extends 'events/base.html' %}
+
+{% block title %}Register for {{ event.title }} - Evenza{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-16">
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-pink-900/20"></div>
+    <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-purple-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-pink-500 rounded-full filter blur-3xl opacity-20 animate-pulse"></div>
+    </div>
+    
+    <div class="relative z-10 w-full max-w-4xl px-4">
+        <div class="gradient-border rounded-2xl p-1">
+            <div class="glass-effect rounded-2xl">
+                <!-- Header -->
+                <div class="p-8 border-b border-gray-800">
+                    <div class="text-center">
+                        <h1 class="text-3xl md:text-4xl font-bold mb-4">
+                            <span class="gradient-text">Register for Event</span>
+                        </h1>
+                        <h2 class="text-xl text-white mb-2">{{ event.title }}</h2>
+                        <div class="flex items-center justify-center space-x-4 text-gray-400">
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-calendar text-purple-400"></i>
+                                <span>{{ event.date|date:"F d, Y - g:i A" }}</span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <i class="fas fa-map-marker-alt text-purple-400"></i>
+                                <span>{{ event.location }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Form -->
+                <div class="p-8">
+                    <form method="post" class="space-y-6">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="glass-effect rounded-lg p-4 border border-red-500/30">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                                    <div>
+                                        <div class="text-red-400 font-medium">Please fix the errors below</div>
+                                        {% for field, errors in form.errors.items %}
+                                            {% for error in errors %}
+                                                <div class="text-gray-400 text-sm">{{ field|title }}: {{ error }}</div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Personal Information -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold text-white flex items-center">
+                                    <i class="fas fa-user text-purple-400 mr-3"></i>
+                                    Personal Information
+                                </h3>
+                                
+                                <div>
+                                    <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Full Name
+                                    </label>
+                                    {{ form.full_name }}
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Email Address
+                                    </label>
+                                    {{ form.email }}
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Phone Number
+                                    </label>
+                                    {{ form.phone }}
+                                </div>
+                            </div>
+
+                            <!-- Professional Information -->
+                            <div class="space-y-6">
+                                <h3 class="text-xl font-semibold text-white flex items-center">
+                                    <i class="fas fa-briefcase text-purple-400 mr-3"></i>
+                                    Professional Information
+                                </h3>
+                                
+                                <div>
+                                    <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Role
+                                    </label>
+                                    {{ form.role }}
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.degree_or_position.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Degree or Position
+                                    </label>
+                                    {{ form.degree_or_position }}
+                                </div>
+
+                                <div>
+                                    <label for="{{ form.organization.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                        Organization
+                                    </label>
+                                    {{ form.organization }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Expectations -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-white flex items-center mb-4">
+                                <i class="fas fa-star text-purple-400 mr-3"></i>
+                                Event Expectations
+                            </h3>
+                            <label for="{{ form.expectations.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                                What do you hope to gain from this event?
+                            </label>
+                            {{ form.expectations }}
+                        </div>
+
+                        <!-- Event Location -->
+                        <div>
+                            <h3 class="text-xl font-semibold text-white flex items-center mb-4">
+                                <i class="fas fa-map-marker-alt text-purple-400 mr-3"></i>
+                                Event Location
+                            </h3>
+                            <div class="glass-effect rounded-xl p-6 border border-gray-800">
+                                <div class="mb-4">
+                                    <div class="text-white font-medium mb-2">{{ event.location }}</div>
+                                    <div class="text-gray-400 text-sm">Event Venue</div>
+                                </div>
+                                <div class="h-64 bg-gray-800 rounded-lg flex items-center justify-center">
+                                    <div class="text-center">
+                                        <i class="fas fa-map text-gray-600 text-4xl mb-3"></i>
+                                        <p class="text-gray-500">Interactive Map</p>
+                                        <p class="text-gray-600 text-sm mt-2">{{ event.location }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="flex justify-between items-center pt-6 border-t border-gray-800">
+                            <a href="{% url 'event_detail' event.pk %}" class="px-6 py-3 glass-effect text-gray-400 rounded-lg hover:bg-white/10 transition-all duration-300 border border-gray-700">
+                                <i class="fas fa-arrow-left mr-2"></i>Back to Event
+                            </a>
+                            <button type="submit" class="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300">
+                                <i class="fas fa-check mr-2"></i>Complete Registration
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
